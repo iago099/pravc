@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arquivo Desbloqueado</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;1,400&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- Variáveis de Design --- */
+        :root {
+            --bg-escuro: #090310;
+            --roxo-base: #2a114c;
+            --roxo-neon: #b388ff;
+            --branco-puro: #ffffff;
+            --texto-claro: #e0e0e0;
+            --transicao-lenta: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* --- Reset e Base --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--bg-escuro);
+            background-image: radial-gradient(circle at center, #1a0a33 0%, var(--bg-escuro) 100%);
+            overflow: hidden; 
+            color: var(--texto-claro);
+            perspective: 1500px;
+        }
+
+        /* =========================================
+           FASE 1: O MISTÉRIO
+           ========================================= */
+        #stage-one {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: clamp(20px, 5vw, 40px);
+            z-index: 10;
+            transition: var(--transicao-lenta);
+            width: 100%;
+            padding: 0 20px;
+        }
+
+        .cryptic-text {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: clamp(0.9rem, 3vw, 1.2rem);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--roxo-neon);
+            text-shadow: 0 0 10px rgba(179, 136, 255, 0.6);
+            animation: pulseText 2s infinite;
+            text-align: center;
+        }
+
+        /* Container de Clique Garantido */
+        .click-area {
+            position: relative;
+            cursor: pointer;
+            z-index: 100;
+            padding: 20px;
+            border-radius: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .click-area:hover {
+            transform: scale(1.05);
+        }
+
+        /* Envelope Responsivo */
+        .envelope-wrapper {
+            width: 100%;
+            min-width: 280px;
+            max-width: 340px;
+            height: clamp(180px, 40vw, 220px);
+            position: relative;
+            transform-style: preserve-3d;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .envelope-back {
+            width: 100%;
+            height: 100%;
+            background-color: var(--roxo-base);
+            border: 2px solid var(--roxo-neon);
+            border-radius: 8px;
+            position: absolute;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8), 0 0 20px rgba(179, 136, 255, 0.2);
+            display: flex;
+            justify-content: center;
+        }
+
+        .envelope-flap {
+            position: absolute;
+            top: 0; left: 0; 
+            width: 100%; height: 100%;
+            background-color: #3b186b; 
+            clip-path: polygon(0 0, 100% 0, 50% 60%);
+            transform-origin: top;
+            transition: var(--transicao-lenta);
+            z-index: 3;
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+        }
+
+        .seal {
+            width: clamp(50px, 15vw, 70px);
+            height: clamp(50px, 15vw, 70px);
+            background: var(--branco-puro);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 4;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Montserrat', sans-serif;
+            font-size: clamp(1.2rem, 5vw, 1.8rem);
+            color: var(--roxo-base);
+            font-weight: 600;
+            transition: var(--transicao-lenta);
+            border: 3px solid var(--roxo-neon);
+        }
+
+        .seal::after {
+            content: '';
+            position: absolute;
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            box-shadow: 0 0 25px var(--branco-puro);
+            opacity: 0.6;
+            animation: pulseSeal 1.5s infinite;
+        }
+
+        .click-hint {
+            margin-top: 15px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.85rem;
+            color: var(--branco-puro);
+            text-align: center;
+            background: rgba(179, 136, 255, 0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: 1px solid var(--roxo-neon);
+            animation: pulseText 1.5s infinite;
+        }
+
+        /* =========================================
+           ESTADOS DE ANIMAÇÃO
+           ========================================= */
+        .collect-stage-one {
+            opacity: 0;
+            transform: translateY(-100px) scale(0.5);
+            pointer-events: none;
+        }
+
+        .open-flap .envelope-flap {
+            transform: rotateX(180deg);
+            background-color: #1a0a33; 
+            z-index: 1;
+        }
+
+        .break-seal .seal {
+            transform: translateY(-50%) scale(0) rotate(360deg);
+            opacity: 0;
+        }
+
+        /* =========================================
+           FASE 2: A REVELAÇÃO
+           ========================================= */
+        #stage-two {
+            position: absolute;
+            opacity: 0;
+            transform: translateY(100px) rotateY(-10deg);
+            transition: var(--transicao-lenta);
+            z-index: 5;
+            visibility: hidden;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        #stage-two.reveal-card {
+            opacity: 1;
+            transform: translateY(0) rotateY(0deg);
+            visibility: visible;
+        }
+
+        .love-card {
+            width: 100%;
+            max-width: 550px;
+            background: rgba(42, 17, 76, 0.6);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding: clamp(30px, 8vw, 50px);
+            border-radius: 15px;
+            border: 1px solid rgba(179, 136, 255, 0.4);
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(179, 136, 255, 0.15);
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .love-card h1 {
+            font-weight: 600;
+            font-size: clamp(1.8rem, 6vw, 2.5rem);
+            color: var(--branco-puro);
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 15px var(--roxo-neon);
+        }
+
+        .love-card p {
+            font-weight: 400;
+            font-size: clamp(1rem, 3.5vw, 1.15rem);
+            line-height: 1.7;
+            margin-bottom: 20px;
+            color: var(--texto-claro);
+        }
+
+        .highlight {
+            color: var(--roxo-neon);
+            font-weight: 600;
+            text-shadow: 0 0 8px rgba(179, 136, 255, 0.5);
+        }
+
+        /* =========================================
+           KEYFRAMES
+           ========================================= */
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotateY(0deg); }
+            50% { transform: translateY(-15px) rotateY(3deg); }
+        }
+
+        @keyframes pulseText {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; text-shadow: 0 0 20px var(--roxo-neon); }
+        }
+
+        @keyframes pulseSeal {
+            0% { box-shadow: 0 0 0px var(--branco-puro); opacity: 0.8; }
+            100% { box-shadow: 0 0 30px var(--roxo-neon); opacity: 0; }
+        }
+
+        /* Animação Chuva de Rosas e Corações */
+        .particle {
+            position: absolute;
+            pointer-events: none; /* Garante que não bloqueie o clique do usuário na carta */
+            z-index: 1;
+            animation: fall linear forwards;
+            /* Sombra suave para destacar no fundo escuro */
+            filter: drop-shadow(0 0 5px rgba(255, 0, 100, 0.4)); 
+        }
+
+        @keyframes fall {
+            0% { 
+                transform: translateY(-5vh) rotate(0deg); 
+                opacity: 0; 
+            }
+            10% { 
+                opacity: 1; /* Aparece suavemente no topo */
+            }
+            80% {
+                opacity: 1;
+            }
+            100% { 
+                /* Cai além da tela e gira para um efeito orgânico */
+                transform: translateY(105vh) rotate(360deg); 
+                opacity: 0; 
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="stage-one">
+        <div class="cryptic-text">Arquivo Confidencial Recebido</div>
+        
+        <div class="click-area" id="trigger-btn">
+            <div class="envelope-wrapper" id="envelope">
+                <div class="envelope-back">
+                    <div class="envelope-flap"></div>
+                    <div class="seal">
+                        <span>?</span>
+                    </div>
+                </div>
+            </div>
+            <div class="click-hint">Toque na tela para abrir</div>
+        </div>
+        
+    </div>
+
+    <div id="stage-two">
+        <div class="love-card">
+            <h1>Acesso Liberado</h1>
+            <p>Análise de compatibilidade concluída. Status da conexão: <span class="highlight">Eficiência Máxima</span>.</p>
+            <p>Nossa relação tem um padrão de qualidade tão excepcional que nenhuma auditoria no mundo conseguiria apontar falhas.</p>
+            <p>Obrigado por ser a energia constante que ilumina meus dias e a parceira perfeita em todos os projetos da vida.</p>
+            <p style="margin-top: 30px; font-size: clamp(1.2rem, 4vw, 1.5rem); color: var(--branco-puro); font-weight: 600; text-shadow: 0 0 10px var(--roxo-neon);">Amo você!</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let isAnimating = false;
+            const triggerBtn = document.getElementById('trigger-btn');
+            const envelope = document.getElementById('envelope');
+            const stageOne = document.getElementById('stage-one');
+            const stageTwo = document.getElementById('stage-two');
+
+            // Array de emojis românticos para a chuva
+            const emojisRomanticos = ['❤️', '🌹', '💖', '💕', '✨', '🥀'];
+
+            triggerBtn.addEventListener('click', () => {
+                if (isAnimating) return;
+                isAnimating = true;
+
+                document.body.style.cursor = 'wait';
+
+                setTimeout(() => { envelope.classList.add('break-seal'); }, 100);
+                setTimeout(() => { envelope.classList.add('open-flap'); }, 600);
+                setTimeout(() => { stageOne.classList.add('collect-stage-one'); }, 1500);
+
+                setTimeout(() => {
+                    stageTwo.classList.add('reveal-card');
+                    document.body.style.cursor = 'default';
+                    startRomanticRain(); // Inicia a nova chuva
+                }, 2000);
+            });
+
+            function startRomanticRain() {
+                // Frequência de queda adaptada para mobile e desktop
+                const isMobile = window.innerWidth < 768;
+                const intervalTime = isMobile ? 400 : 200; 
+                
+                setInterval(createRomanticParticle, intervalTime);
+            }
+
+            function createRomanticParticle() {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Escolhe um emoji aleatório da nossa lista
+                const randomEmoji = emojisRomanticos[Math.floor(Math.random() * emojisRomanticos.length)];
+                particle.innerHTML = randomEmoji;
+                
+                // Posição horizontal aleatória (0 a 100 da largura da tela)
+                particle.style.left = Math.random() * 100 + 'vw';
+                
+                // Tamanhos variados para dar sensação de profundidade (pequenos ao fundo, grandes na frente)
+                const size = Math.random() * 20 + 15; // Entre 15px e 35px
+                particle.style.fontSize = size + 'px';
+                
+                // Duração da queda variada (caem em velocidades diferentes)
+                const duration = Math.random() * 4 + 4; // Entre 4s e 8s
+                particle.style.animationDuration = duration + 's';
+
+                // Adiciona a partícula na tela
+                document.body.appendChild(particle);
+
+                // Garbage Collection: remove a partícula depois que ela sai da tela
+                setTimeout(() => {
+                    particle.remove();
+                }, duration * 1000);
+            }
+        });
+    </script>
+</body>
+</html>
